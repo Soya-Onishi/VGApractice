@@ -16,6 +16,9 @@ class Top extends Module {
     val vgaHS = Output(Bool())
     val vgaVS = Output(Bool())
     val outclk = Output(Clock())
+
+    val hCount = Output(Vec(3, UInt(7.W)))
+    val vCount = Output(Vec(3, UInt(7.W)))
   })
 
   val pll = Module(new pll)
@@ -25,6 +28,8 @@ class Top extends Module {
   val phasedClock = (pll.io.c0 && pll.io.locked).asClock()
   withClockAndReset(phasedClock, reset) {
     val pattern = Module(new Pattern)
+    val hLedDec = Module(new LedDecoder(3))
+    val vLedDec = Module(new LedDecoder(3))
 
     pattern.io.slideVertical := io.slideVertical
     pattern.io.slideHorizontal := io.slideHorizontal
@@ -36,6 +41,11 @@ class Top extends Module {
 
     io.vgaHS := pattern.io.vgaHS
     io.vgaVS := pattern.io.vgaVS
+
+    hLedDec.io.in := pattern.io.hCount
+    vLedDec.io.in := pattern.io.vCount
+    io.hCount := hLedDec.io.outs
+    io.vCount := vLedDec.io.outs
   }
 
   io.outclk := phasedClock

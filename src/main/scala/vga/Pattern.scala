@@ -14,6 +14,9 @@ class Pattern extends Module with VGAParams {
     }
     val vgaHS = Output(Bool())
     val vgaVS = Output(Bool())
+
+    val hCount = Output(UInt(10.W))
+    val vCount = Output(UInt(10.W))
   })
 
   val hOffsetCounter = RegInit(0.U(8.W))
@@ -46,6 +49,9 @@ class Pattern extends Module with VGAParams {
 
   io.vgaHS := syncGen.io.vgaHS
   io.vgaVS := syncGen.io.vgaVS
+
+  io.hCount := syncGen.io.hCount
+  io.vCount := syncGen.io.vCount
 
   def returnColor(color: Bool): UInt = {
     Mux(color, 255.U(8.W), 0.U(8.W))

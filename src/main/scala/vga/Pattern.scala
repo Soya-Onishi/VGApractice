@@ -5,9 +5,9 @@ import chisel3._
 class Pattern extends Module with VGAParams {
   val io = IO(new Bundle {
     val rgb = new Bundle {
-      val r = Output(UInt(4.W))
-      val g = Output(UInt(4.W))
-      val b = Output(UInt(4.W))
+      val r = Output(UInt(8.W))
+      val g = Output(UInt(8.W))
+      val b = Output(UInt(8.W))
     }
     val vgaHS = Output(Bool())
     val vgaVS = Output(Bool())
@@ -49,9 +49,9 @@ class Pattern extends Module with VGAParams {
 
   when(displayEnable) {
     val color = vOffset ^ hOffset
-    io.rgb.r := color(2)
-    io.rgb.g := color(1)
-    io.rgb.b := color(0)
+    io.rgb.r := returnColor(color(2).asBool)
+    io.rgb.g := returnColor(color(1).asBool)
+    io.rgb.b := returnColor(color(0).asBool)
   } otherwise {
     io.rgb.r := 0.U
     io.rgb.g := 0.U
@@ -60,4 +60,8 @@ class Pattern extends Module with VGAParams {
 
   io.vgaHS := syncGen.io.vgaHS
   io.vgaVS := syncGen.io.vgaVS
+
+  def returnColor(color: Bool): UInt = {
+    Mux(color, 255.U(8.W), 0.U(8.W))
+  }
 }

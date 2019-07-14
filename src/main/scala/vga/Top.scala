@@ -1,3 +1,4 @@
+
 package vga
 
 import chisel3._
@@ -5,11 +6,12 @@ import chisel3.core.withClockAndReset
 
 class Top extends Module {
   val io = IO(new Bundle {
-    val r = Output(UInt(4.W))
-    val g = Output(UInt(4.W))
-    val b = Output(UInt(4.W))
+    val r = Output(UInt(8.W))
+    val g = Output(UInt(8.W))
+    val b = Output(UInt(8.W))
     val vgaHS = Output(Bool())
     val vgaVS = Output(Bool())
+    val outclk = Output(Clock())
   })
 
   val pll = Module(new pll)
@@ -28,4 +30,6 @@ class Top extends Module {
     io.vgaHS := pattern.io.vgaHS
     io.vgaVS := pattern.io.vgaVS
   }
+
+  io.outclk := phasedClock
 }

@@ -41,6 +41,7 @@ class DisplayRegs extends Module {
     }
   }
 
+  /*
   regs.foreach {
     hRegs =>
       hRegs.foldLeft(hRegs.last){
@@ -71,6 +72,7 @@ class DisplayRegs extends Module {
       above.last := Mux(io.slide, below(0), above.last)
       below
   }
+  */
 
   val r = regs(0)(0)(0).asBool()
   val g = regs(0)(0)(1).asBool()

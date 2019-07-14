@@ -4,6 +4,9 @@ import chisel3._
 
 class Pattern extends Module with VGAParams {
   val io = IO(new Bundle {
+    val slideVertical = Input(Bool())
+    val slideHorizontal = Input(Bool())
+
     val rgb = new Bundle {
       val r = Output(UInt(8.W))
       val g = Output(UInt(8.W))
@@ -11,9 +14,6 @@ class Pattern extends Module with VGAParams {
     }
     val vgaHS = Output(Bool())
     val vgaVS = Output(Bool())
-
-    val hCount = Output(UInt(10.W))
-    val vCount = Output(UInt(10.W))
   })
 
   val hOffsetCounter = RegInit(0.U(8.W))
@@ -22,11 +22,17 @@ class Pattern extends Module with VGAParams {
   val vOffset = RegInit(0.U(3.W))
 
   val syncGen = Module(new SyncGen)
+  val displayRegs = Module(new DisplayRegs)
 
   val displayEnable =
     (verticalBlank < syncGen.io.vCount) &&
       (horizontalBlank < syncGen.io.hCount) &&
       (syncGen.io.hCount < horizontalPeriod)
+
+  displayRegs.io.frameCountUp := (syncGen.io.vCount === verticalBlank) && (syncGen.io.hCount === horizontalBlank)
+  displayRegs.io.slideVertical := io.slideVertical
+  displayRegs.io.slideHorizontal := io.slideHorizontal
+  displayRegs.io.slide := displayEnable
 
   /*
   when (syncGen.io.hCount < horizontalBlank) {
@@ -55,9 +61,9 @@ class Pattern extends Module with VGAParams {
   when(displayEnable) {
     //val color = vOffset ^ hOffset
     val color = "b100".U(3.W)
-    io.rgb.r := returnColor(color(2).asBool)
-    io.rgb.g := returnColor(color(1).asBool)
-    io.rgb.b := returnColor(color(0).asBool)
+    io.rgb.r := displayRegs.io.rgb.r
+    io.rgb.g := displayRegs.io.rgb.g
+    io.rgb.b := displayRegs.io.rgb.b
   } otherwise {
     io.rgb.r := 0.U
     io.rgb.g := 0.U
@@ -70,7 +76,4 @@ class Pattern extends Module with VGAParams {
   def returnColor(color: Bool): UInt = {
     Mux(color, 255.U(8.W), 0.U(8.W))
   }
-
-  io.hCount :=syncGen.io.hCount
-  io.vCount :=syncGen.io.vCount
 }

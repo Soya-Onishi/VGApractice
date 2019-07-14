@@ -16,8 +16,8 @@ class Top extends Module {
 
     val vgaHSDebug = Output(Bool())
     val vgaVSDebug = Output(Bool())
-    val hCount = Output(Vec(3, UInt(4.W)))
-    val vCount = Output(Vec(3, UInt(4.W)))
+    val hCount = Output(Vec(3, UInt(7.W)))
+    val vCount = Output(Vec(3, UInt(7.W)))
   })
 
   val hLedDec = Module(new LedDecoder(3))

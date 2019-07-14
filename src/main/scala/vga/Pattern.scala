@@ -25,6 +25,7 @@ class Pattern extends Module with VGAParams {
       (horizontalBlank < syncGen.io.hCount) &&
       (syncGen.io.hCount < horizontalPeriod)
 
+  /*
   when (syncGen.io.hCount < horizontalBlank) {
     hOffsetCounter := 0.U
     hOffset := 0.U
@@ -46,9 +47,11 @@ class Pattern extends Module with VGAParams {
       vOffsetCounter := vOffsetCounter + 1.U
     }
   }
+  */
 
   when(displayEnable) {
-    val color = vOffset ^ hOffset
+    //val color = vOffset ^ hOffset
+    val color = "b100".U(3.W)
     io.rgb.r := returnColor(color(2).asBool)
     io.rgb.g := returnColor(color(1).asBool)
     io.rgb.b := returnColor(color(0).asBool)

@@ -16,10 +16,10 @@ class SyncGen extends Module with VGAParams {
   val hCount = RegInit(0.U(10.W))
   val vCount = RegInit(0.U(10.W))
 
-  when (hCount === horizontalPeriod) {
+  when (hCount === (horizontalPeriod - 1.U)) {
     hCount := 0.U
 
-    when (vCount === verticalPeriod) {
+    when (vCount === (verticalPeriod - 1.U)) {
       vCount := 0.U
     } otherwise {
       vCount := vCount + 1.U

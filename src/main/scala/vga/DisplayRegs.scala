@@ -60,6 +60,7 @@ class DisplayRegs extends Module {
 
       below
   }
+  */
 
   regs.foldLeft(regs.last) {
     case (above, below) =>
@@ -72,13 +73,13 @@ class DisplayRegs extends Module {
       above.last := Mux(io.slide, below(0), above.last)
       below
   }
-  */
 
-  val r = regs(0)(0)(0).asBool()
-  val g = regs(0)(0)(1).asBool()
-  val b = regs(0)(0)(2).asBool()
+  val rgb = regs(0)(0)
+  val r = rgb(0).asBool()
+  val g = rgb(1).asBool()
+  val b = rgb(2).asBool()
 
   io.rgb.r := Mux(r, 255.U, 0.U)
-  io.rgb.g := Mux(r, 255.U, 0.U)
-  io.rgb.b := Mux(r, 255.U, 0.U)
+  io.rgb.g := Mux(g, 255.U, 0.U)
+  io.rgb.b := Mux(b, 255.U, 0.U)
 }

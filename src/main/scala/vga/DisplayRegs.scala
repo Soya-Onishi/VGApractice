@@ -6,6 +6,7 @@ import chisel3.util.MuxLookup
 class DisplayRegs extends Module {
   val io = IO(new Bundle {
     val slide = Input(Bool())
+    val startLine = Input(Bool())
     val frameCountUp = Input(Bool())
     val slideHorizontal = Input(Bool())
     val slideVertical = Input(Bool())
@@ -23,11 +24,19 @@ class DisplayRegs extends Module {
     })
   })
 
-  val clockCounter = RegInit(0.U(3.W))
+  val horizontalCounter = RegInit(0.U(3.W))
+  val verticalCounter = RegInit(0.U(3.W))
+
   when(io.slide) {
-    clockCounter := Mux(clockCounter === 7.U, 0.U, clockCounter + 1.U)
+    horizontalCounter := Mux(horizontalCounter === 7.U, 0.U, horizontalCounter + 1.U)
   }
-  val shiftDot = io.slide && (clockCounter === 7.U)
+  val shiftLeft = io.slide && (horizontalCounter === 7.U)
+
+  when(io.startLine) {
+    verticalCounter := Mux(verticalCounter === 7.U, 0.U, verticalCounter + 1.U)
+  }
+  val shiftUp = io.startLine && (verticalCounter === 7.U)
+
 
 
   val initColors = (0 until 4).map {
@@ -65,13 +74,17 @@ class DisplayRegs extends Module {
 
   regs.foldLeft(regs.last) {
     case (above, below) =>
-      below.tail.foldLeft(below.head) {
+      below.foldLeft(below.last) {
         case (left, right) =>
-          left := Mux(shiftDot, right, left)
+          left := Mux(shiftLeft, right, left)
           right
       }
 
-      above.last := Mux(shiftDot, below(0), above.last)
+      above.zip(below).foreach {
+        case(ab, be) =>
+          ab := Mux(shiftUp, be, ab)
+      }
+
       below
   }
 

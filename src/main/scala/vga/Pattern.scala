@@ -36,9 +36,10 @@ class Pattern extends Module with VGAParams {
   val displayEnable =
     (verticalBlank <= syncGen.io.vCount) && (horizontalBlank <= syncGen.io.hCount)
 
-  displayRegs.io.frameCountUp := (syncGen.io.vCount === verticalBlank) && (syncGen.io.hCount === horizontalBlank)
   displayRegs.io.slideVertical := io.slideVertical
   displayRegs.io.slideHorizontal := io.slideHorizontal
+  displayRegs.io.startLine := syncGen.io.hCount === 1.U
+  displayRegs.io.frameCountUp := (syncGen.io.vCount === 0.U) && (syncGen.io.hCount === 0.U)
   displayRegs.io.slide := displayEnable
 
   io.rgbBool := displayRegs.io.rgbBool

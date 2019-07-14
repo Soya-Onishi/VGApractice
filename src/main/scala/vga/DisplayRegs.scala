@@ -7,7 +7,7 @@ class DisplayRegs extends Module {
   val io = IO(new Bundle {
     val slide = Input(Bool())
     val startLine = Input(Bool())
-    val frameCountUp = Input(Bool())
+    val newFrame = Input(Bool())
     val slideHorizontal = Input(Bool())
     val slideVertical = Input(Bool())
 
@@ -37,8 +37,6 @@ class DisplayRegs extends Module {
   }
   val shiftUp = io.startLine && (verticalCounter === 7.U)
 
-
-
   val initColors = (0 until 4).map {
     v => (0 until 8).map {
       h => ((v + h) % 8).U(3.W)
@@ -51,26 +49,23 @@ class DisplayRegs extends Module {
     }
   }
 
-  /*
   regs.foreach {
-    hRegs =>
-      hRegs.foldLeft(hRegs.last){
-        case (left, right) =>
-          left := Mux(io.slideHorizontal && doSlide, right, left)
-          right
-      }
+    line => line.foldLeft(line.last) {
+      case (left, right) =>
+        left := Mux(io.newFrame && io.slideHorizontal && !io.slideVertical, right, left)
+        right
+    }
   }
 
   regs.foldLeft(regs.last) {
     case (above, below) =>
       above.zip(below).foreach {
         case (ab, be) =>
-          ab := Mux(io.slideVertical && doSlide, be, ab)
+          ab := Mux(io.newFrame && io.slideVertical && !io.slideHorizontal, ab, be)
       }
 
       below
   }
-  */
 
   regs.foldLeft(regs.last) {
     case (above, below) =>

@@ -1,6 +1,7 @@
 package vga
 
 import chisel3._
+import chisel3.util.MuxLookup
 
 class SyncGen extends Module with VGAParams {
   val io = IO(new Bundle {
@@ -27,16 +28,23 @@ class SyncGen extends Module with VGAParams {
     hCount := hCount + 1.U
   }
 
-  when(hCount === horizontalSignalStart) {
-    vgaHS := false.B
 
-    when(vCount === verticalSignalStart) {
-      vgaVS := false.B
-    } otherwise {
-      vgaVS := true.B
-    }
-  } otherwise {
-    vgaHS := true.B
+  vgaHS := MuxLookup(
+    hCount, vgaHS,
+    Array(
+      horizontalSignalStart -> false.B,
+      horizontalSignalEnd -> true.B
+    )
+  )
+
+  when(hCount === horizontalSignalStart) {
+    vgaVS := MuxLookup(
+      vCount, vgaVS,
+      Array(
+        verticalSignalStart -> false.B,
+        verticalSignalEnd -> true.B
+      )
+    )
   }
 
   io.vgaVS := vgaVS

@@ -10,6 +10,8 @@ class Top extends Module {
     val slideVertical = Input(Bool())
     val slideHorizontal = Input(Bool())
 
+    val clkReset = Input(Bool())
+
     val r = Output(UInt(8.W))
     val g = Output(UInt(8.W))
     val b = Output(UInt(8.W))
@@ -29,7 +31,7 @@ class Top extends Module {
 
   val pll = Module(new pll)
   pll.io.inclk0 := clock
-  pll.io.areset := reset
+  pll.io.areset := io.clkReset
 
   val phasedClock = (pll.io.c0 && pll.io.locked).asClock()
   withClockAndReset(phasedClock, reset) {

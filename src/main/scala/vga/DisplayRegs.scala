@@ -23,16 +23,11 @@ class DisplayRegs extends Module {
     })
   })
 
-  val frameCounter = RegInit(0.U(2.W))
-  when(io.frameCountUp) {
-    when(frameCounter === 3.U) {
-      frameCounter := 0.U
-    } .otherwise {
-      frameCounter := frameCounter + 1.U
-    }
+  val clockCounter = RegInit(0.U(3.W))
+  when(io.slide) {
+    clockCounter := Mux(clockCounter === 7.U, 0.U, clockCounter + 1.U)
   }
-
-  val doSlide = frameCounter === 3.U && io.frameCountUp
+  val shiftDot = io.slide && (clockCounter === 7.U)
 
 
   val initColors = (0 until 4).map {
@@ -72,11 +67,11 @@ class DisplayRegs extends Module {
     case (above, below) =>
       below.tail.foldLeft(below.head) {
         case (left, right) =>
-          left := Mux(io.slide, right, left)
+          left := Mux(shiftDot, right, left)
           right
       }
 
-      above.last := Mux(io.slide, below(0), above.last)
+      above.last := Mux(shiftDot, below(0), above.last)
       below
   }
 

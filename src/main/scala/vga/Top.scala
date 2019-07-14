@@ -19,6 +19,12 @@ class Top extends Module {
 
     val hCount = Output(Vec(3, UInt(7.W)))
     val vCount = Output(Vec(3, UInt(7.W)))
+
+    val rgbBool = Output(new Bundle {
+      val r = Bool()
+      val g = Bool()
+      val b = Bool()
+    })
   })
 
   val pll = Module(new pll)
@@ -46,6 +52,8 @@ class Top extends Module {
     vLedDec.io.in := pattern.io.vCount
     io.hCount := hLedDec.io.outs
     io.vCount := vLedDec.io.outs
+
+    io.rgbBool := pattern.io.rgbBool
   }
 
   io.outclk := phasedClock

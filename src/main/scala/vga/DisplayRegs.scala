@@ -15,6 +15,12 @@ class DisplayRegs extends Module {
       val g = UInt(8.W)
       val b = UInt(8.W)
     })
+
+    val rgbBool = Output(new Bundle{
+      val r = Bool()
+      val g = Bool()
+      val b = Bool()
+    })
   })
 
   val frameCounter = RegInit(0.U(2.W))
@@ -82,4 +88,8 @@ class DisplayRegs extends Module {
   io.rgb.r := Mux(r, 255.U, 0.U)
   io.rgb.g := Mux(g, 255.U, 0.U)
   io.rgb.b := Mux(b, 255.U, 0.U)
+
+  io.rgbBool.r := r
+  io.rgbBool.g := g
+  io.rgbBool.b := b
 }

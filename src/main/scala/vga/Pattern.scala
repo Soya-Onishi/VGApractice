@@ -12,6 +12,12 @@ class Pattern extends Module with VGAParams {
       val g = Output(UInt(8.W))
       val b = Output(UInt(8.W))
     }
+    val rgbBool = new Bundle {
+      val r = Output(Bool())
+      val g = Output(Bool())
+      val b = Output(Bool())
+    }
+
     val vgaHS = Output(Bool())
     val vgaVS = Output(Bool())
 
@@ -36,6 +42,8 @@ class Pattern extends Module with VGAParams {
   displayRegs.io.slideVertical := io.slideVertical
   displayRegs.io.slideHorizontal := io.slideHorizontal
   displayRegs.io.slide := displayEnable
+
+  io.rgbBool := displayRegs.io.rgbBool
 
   when(displayEnable) {
     io.rgb.r := displayRegs.io.rgb.r

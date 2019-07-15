@@ -49,38 +49,25 @@ class DisplayRegs extends Module {
     }
   }
 
-  regs.foreach {
-    line => line.foldLeft(line.last) {
-      case (left, right) =>
-        left := Mux(io.newFrame && io.slideHorizontal && !io.slideVertical, right, left)
-        right
-    }
-  }
 
-  regs.foldLeft(regs.last) {
-    case (above, below) =>
-      above.zip(below).foreach {
-        case (ab, be) =>
-          ab := Mux(io.newFrame && io.slideVertical && !io.slideHorizontal, ab, be)
-      }
-
-      below
-  }
-
-  regs.foldLeft(regs.last) {
-    case (above, below) =>
-      below.foldLeft(below.last) {
+  when((io.newFrame && io.slideHorizontal && !io.slideVertical) || shiftLeft) {
+    regs.foreach {
+      line => line.foldLeft(line.last) {
         case (left, right) =>
-          left := Mux(shiftLeft, right, left)
+          left := right
           right
       }
+    }
+  } .elsewhen((io.newFrame && io.slideVertical && !io.slideHorizontal) || shiftUp) {
+    regs.foldLeft(regs.last) {
+      case (aboveLine, belowLine) =>
+        aboveLine.zip(belowLine).foreach {
+          case (above, below) =>
+            above := below
+        }
 
-      above.zip(below).foreach {
-        case(ab, be) =>
-          ab := Mux(shiftUp, be, ab)
-      }
-
-      below
+        belowLine
+    }
   }
 
   val rgb = regs(0)(0)

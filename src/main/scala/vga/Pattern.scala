@@ -38,7 +38,7 @@ class Pattern extends Module with VGAParams {
 
   displayRegs.io.slideVertical := io.slideVertical
   displayRegs.io.slideHorizontal := io.slideHorizontal
-  displayRegs.io.startLine := syncGen.io.hCount === 1.U
+  displayRegs.io.startLine := (syncGen.io.hCount === 1.U) && (verticalBlank <= syncGen.io.vCount)
   displayRegs.io.newFrame := (syncGen.io.vCount === 0.U) && (syncGen.io.hCount === 0.U)
   displayRegs.io.slide := displayEnable
 

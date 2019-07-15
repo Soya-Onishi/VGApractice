@@ -90,6 +90,24 @@ class DisplayRegs extends Module {
 
         belowLine
     }
+  } .elsewhen(io.newFrame && io.slideHorizontal) {
+    regs.foreach {
+      line => line.foldLeft(line.last) {
+        case (left, right) =>
+          left := right
+          right
+      }
+    }
+  } .elsewhen(io.newFrame && io.slideVertical) {
+    regs.foldLeft(regs.last) {
+      case (aboveLine, belowLine) =>
+        aboveLine.zip(belowLine).foreach {
+          case (above, below) =>
+            above := below
+        }
+
+        belowLine
+    }
   }
 
   val rgb = regs(0)(0)

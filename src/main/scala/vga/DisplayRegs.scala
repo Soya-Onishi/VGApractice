@@ -50,6 +50,7 @@ class DisplayRegs extends Module {
   }
 
 
+  /*
   when((io.newFrame && io.slideHorizontal && !io.slideVertical) || shiftLeft) {
     regs.foreach {
       line => line.foldLeft(line.last) {
@@ -59,6 +60,27 @@ class DisplayRegs extends Module {
       }
     }
   } .elsewhen((io.newFrame && io.slideVertical && !io.slideHorizontal) || shiftUp) {
+    regs.foldLeft(regs.last) {
+      case (aboveLine, belowLine) =>
+        aboveLine.zip(belowLine).foreach {
+          case (above, below) =>
+            above := below
+        }
+
+        belowLine
+    }
+  }
+  */
+
+  when(shiftLeft) {
+    regs.foreach {
+      line => line.foldLeft(line.last) {
+        case (left, right) =>
+          left := right
+          right
+      }
+    }
+  } .elsewhen(shiftUp) {
     regs.foldLeft(regs.last) {
       case (aboveLine, belowLine) =>
         aboveLine.zip(belowLine).foreach {

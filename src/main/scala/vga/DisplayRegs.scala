@@ -50,41 +50,13 @@ class DisplayRegs extends Module {
   }
 
   when(shiftLeft) {
-    regs.foreach {
-      line => line.foldLeft(line.last) {
-        case (left, right) =>
-          left := right
-          right
-      }
-    }
+    dotsShiftLeft(regs)
   } .elsewhen(shiftUp) {
-    regs.foldLeft(regs.last) {
-      case (aboveLine, belowLine) =>
-        aboveLine.zip(belowLine).foreach {
-          case (above, below) =>
-            above := below
-        }
-
-        belowLine
-    }
+    dotsShiftAbove(regs)
   } .elsewhen(io.newFrame && io.slideHorizontal) {
-    regs.foreach {
-      line => line.foldLeft(line.last) {
-        case (left, right) =>
-          left := right
-          right
-      }
-    }
+    dotsShiftLeft(regs)
   } .elsewhen(io.newFrame && io.slideVertical) {
-    regs.foldLeft(regs.last) {
-      case (aboveLine, belowLine) =>
-        aboveLine.zip(belowLine).foreach {
-          case (above, below) =>
-            above := below
-        }
-
-        belowLine
-    }
+    dotsShiftAbove(regs)
   }
 
   val rgb = regs(0)(0)
@@ -99,4 +71,22 @@ class DisplayRegs extends Module {
   io.rgbBool.r := r
   io.rgbBool.g := g
   io.rgbBool.b := b
+
+  private def dotsShiftLeft(dots: IndexedSeq[IndexedSeq[UInt]]): Unit = dots.foreach {
+    line => line.foldLeft(line.last) {
+      case (left, right) =>
+        left := right
+        right
+    }
+  }
+
+  private def dotsShiftAbove(dots: IndexedSeq[IndexedSeq[UInt]]): Unit = dots.foldLeft(dots.last) {
+    case (aboveLine, belowLine) =>
+      aboveLine.zip(belowLine).foreach {
+        case (above, below) =>
+          above := below
+      }
+
+      belowLine
+  }
 }
